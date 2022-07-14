@@ -22,9 +22,9 @@ def predict():
 def predictGraph():
     if request.method == "POST":
         print(request.form.get('pred_length'))
-        length = int(request.form.get('pred_length'))
+        length = int(request.form.get('pred_length'))+1
         update_dataset()
-        p_url = create_plot(1000, length)
+        p_url = create_plot(500, length)
         return render_template("prediction-graph.html", plot_url='data:image/png;base64,{}'.format(p_url))
 
 

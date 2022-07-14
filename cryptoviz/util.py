@@ -8,7 +8,7 @@ import pandas as pd
 import requests
 from keras.models import load_model
 from binance.client import Client
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, rc
 from newsapi import NewsApiClient
 
 N_PAST = 28  # Number of past hours we want to use to predict the future.
@@ -66,18 +66,23 @@ def predict_future(length=10):
 
 def create_plot(hist_length, pred_length):
     df = getDf()
-    prediction = predict_future(pred_length)
     df[['price', 'sentiment']] = scaler.inverse_transform(df[['price', 'sentiment']])
+    prediction = df.tail(1)
+    prediction = prediction.append(predict_future(pred_length))
 
+    font = {'family': 'normal',
+            'weight': 'bold',
+            'size': 15}
+    rc('font', **font)
     plt.figure(figsize=(15, 8))
     plt.plot(prediction['timestamp'], prediction['price'], label='Predicted price of BTC', color='red')
     plt.plot(df['timestamp'][-hist_length:], df['price'][-hist_length:], label='Historic price of BTC', color='blue')
     plt.grid(color='grey')
     plt.xlabel('Timestamp')
-    plt.ylabel('Price')
+    plt.ylabel('Price in USDT')
     plt.title('Historic and predicted price of BTC')
     plt.legend()
-    plt.style.use('dark_background')
+    # plt.style.use('dark_background')
 
     img = io.BytesIO()
     plt.savefig(img, format='png')
